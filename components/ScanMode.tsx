@@ -14,6 +14,7 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [showShutter, setShowShutter] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +28,7 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
         setIsStreaming(true);
       }
     } catch (err) {
-      setError("CAMERA_ACCESS_DENIED");
+      setError("OPTICAL_SENSOR_NOT_READY");
       console.error(err);
     }
   };
@@ -35,8 +36,7 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
   const stopCamera = useCallback(() => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      tracks.forEach(track => track.stop());
+      stream.getTracks().forEach(track => track.stop());
       videoRef.current.srcObject = null;
       setIsStreaming(false);
     }
@@ -50,6 +50,9 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
   const handleCapture = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
+    setShowShutter(true);
+    setTimeout(() => setShowShutter(false), 300);
+
     setAnalyzing(true);
     setResult(null);
 
@@ -61,8 +64,7 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      // Use slightly lower quality for history storage optimization
-      const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+      const base64Image = canvas.toDataURL('image/jpeg', 0.85);
       const analysis = await analyzeImage(base64Image);
       
       historyService.save(analysis, base64Image);
@@ -73,16 +75,17 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full min-h-[600px] relative bg-neutral-50 dark:bg-black transition-colors duration-300">
-      {/* Viewfinder Container - Always dark for better contrast with video */}
-      <div className="relative w-full max-w-4xl h-[60vh] bg-black overflow-hidden border-y border-neutral-200 dark:border-neutral-800 shadow-xl dark:shadow-none">
+      <div className="relative w-full max-w-4xl h-[65vh] bg-black overflow-hidden border-y border-neutral-200 dark:border-neutral-800 shadow-2xl">
         {!isStreaming && !error && (
-            <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-mono text-xs text-neutral-500 animate-pulse">INITIALIZING OPTICS...</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-20">
+                <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mb-4"></div>
+                <span className="font-mono text-[10px] text-neutral-500 tracking-[0.3em]">CALIBRATING_OPTICS...</span>
             </div>
         )}
+        
         {error && (
-            <div className="absolute inset-0 flex items-center justify-center text-red-500 font-mono text-xs">
-                ERROR: {error}
+            <div className="absolute inset-0 flex items-center justify-center text-red-500 font-mono text-xs z-20 bg-black">
+                CRITICAL_ERROR: {error}
             </div>
         )}
         
@@ -91,68 +94,87 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
           autoPlay 
           playsInline 
           muted 
-          className="w-full h-full object-cover opacity-80"
+          className="w-full h-full object-cover opacity-90"
         />
         <canvas ref={canvasRef} className="hidden" />
 
-        {/* Technical Overlays */}
+        {/* Shutter Effect Overlay */}
+        <div className={`absolute inset-0 bg-white z-30 pointer-events-none ${showShutter ? 'animate-shutter' : 'opacity-0'}`}></div>
+
+        {/* Technical Hud */}
         {isStreaming && !result && (
-            <>
-                <div className="absolute inset-0 pointer-events-none">
-                    {/* Grid lines */}
-                    <div className="absolute top-1/3 w-full h-px bg-white/10"></div>
-                    <div className="absolute top-2/3 w-full h-px bg-white/10"></div>
-                    <div className="absolute left-1/3 h-full w-px bg-white/10"></div>
-                    <div className="absolute left-2/3 h-full w-px bg-white/10"></div>
-                    
-                    {/* Center bracket */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-white/20">
-                        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white"></div>
-                        <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white"></div>
-                        <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white"></div>
-                        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white"></div>
-                    </div>
+            <div className="absolute inset-0 pointer-events-none select-none">
+                <div className="absolute top-1/4 w-full h-px bg-white/5"></div>
+                <div className="absolute top-2/4 w-full h-px bg-white/5"></div>
+                <div className="absolute top-3/4 w-full h-px bg-white/5"></div>
+                <div className="absolute left-1/4 h-full w-px bg-white/5"></div>
+                <div className="absolute left-2/4 h-full w-px bg-white/5"></div>
+                <div className="absolute left-3/4 h-full w-px bg-white/5"></div>
+                
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-white/10">
+                    <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
+                    <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 </div>
 
-                {/* Scan Line Animation */}
+                <div className="absolute bottom-6 left-6 font-mono text-[10px] text-white/40 flex flex-col gap-1">
+                    <div>MODE: WASTE_DISCRIMINATION_V3</div>
+                    <div>SENSORS: ACTIVE</div>
+                    <div className="flicker">TARGET_LOCK: STANDBY</div>
+                </div>
+
                 {!analyzing && (
-                   <div className="absolute top-0 left-0 w-full h-1 bg-white/50 shadow-[0_0_20px_rgba(255,255,255,0.5)] scan-line pointer-events-none"></div> 
+                   <div className="absolute top-0 left-0 w-full h-1 bg-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)] scan-line"></div> 
                 )}
-            </>
+            </div>
         )}
 
-        {/* Processing State */}
         {analyzing && (
-            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
-                 <div className="font-mono text-2xl tracking-widest text-white mb-4 animate-pulse">PROCESSING</div>
-                 <div className="w-64 h-1 bg-neutral-800">
-                    <div className="h-full bg-white animate-[width_1s_ease-in-out_infinite]" style={{width: '50%'}}></div>
+            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-40 backdrop-blur-md">
+                 <div className="font-mono text-xl tracking-[0.4em] text-white mb-6 animate-pulse">ANALYZING</div>
+                 <div className="w-48 h-0.5 bg-neutral-800 relative overflow-hidden">
+                    <div className="absolute h-full bg-white animate-[progress_1s_ease-in-out_infinite]" style={{width: '30%'}}></div>
                  </div>
+                 <style>{`
+                    @keyframes progress {
+                        0% { transform: translateX(-100%); }
+                        100% { transform: translateX(300%); }
+                    }
+                 `}</style>
             </div>
         )}
       </div>
 
-      {/* Control Panel */}
-      <div className="mt-8 flex flex-col items-center w-full max-w-md gap-4 px-4">
+      <div className="mt-8 flex flex-col items-center w-full max-w-md gap-4 px-4 pb-12">
         {result ? (
             <div className="w-full animate-fade-in-up">
                 <ResultCard 
                     result={result} 
                     onDismiss={() => setResult(null)} 
-                    resetLabel="RERUN SCAN"
+                    resetLabel="DISCARD & SCAN"
                 />
             </div>
         ) : (
-            <div className="flex gap-6 w-full items-center justify-center">
-                 <Button variant="ghost" onClick={onStop}>BACK</Button>
+            <div className="flex gap-10 w-full items-center justify-center">
+                 <button 
+                    onClick={onStop}
+                    className="font-mono text-xs tracking-widest text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                 >
+                    [ TERMINATE ]
+                 </button>
+                 
                  <button 
                     onClick={handleCapture}
                     disabled={!isStreaming || analyzing}
-                    className="w-16 h-16 rounded-full border-2 border-neutral-900 dark:border-white flex items-center justify-center hover:bg-neutral-900/10 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+                    className="w-20 h-20 rounded-full border-2 border-neutral-900 dark:border-white p-1 flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-30 group"
                  >
-                    <div className="w-12 h-12 bg-neutral-900 dark:bg-white rounded-full group-hover:scale-90 transition-transform"></div>
+                    <div className="w-full h-full bg-neutral-900 dark:bg-white rounded-full flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white dark:border-black rounded-sm"></div>
+                    </div>
                  </button>
-                 <div className="w-20"></div> {/* Spacer for symmetry */}
+
+                 <div className="w-16"></div>
             </div>
         )}
       </div>

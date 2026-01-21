@@ -2,8 +2,11 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TriVision Sort</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>TriVision Sort | AI Waste Classification</title>
+    <meta name="description" content="Advanced computer vision system for real-time waste classification and environmental sorting." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="/manifest.json" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -11,8 +14,19 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+              sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+            },
+            animation: {
+              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'shutter': 'shutter 0.3s ease-out forwards',
+            },
+            keyframes: {
+              shutter: {
+                '0%': { opacity: '0' },
+                '50%': { opacity: '0.8' },
+                '100%': { opacity: '0' },
+              }
             }
           }
         }
@@ -20,36 +34,39 @@
     </script>
     <style>
       body {
-        /* Default to light mode colors, overridden by dark mode class */
-        @apply bg-neutral-50 text-neutral-900 dark:bg-black dark:text-white transition-colors duration-300;
-        font-family: 'Inter', system-ui, sans-serif;
-        -webkit-font-smoothing: antialiased;
+        @apply bg-neutral-50 text-neutral-900 dark:bg-black dark:text-white transition-colors duration-300 antialiased overflow-x-hidden;
       }
-      /* Custom scrollbar for results */
+      
       ::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
       }
       ::-webkit-scrollbar-track {
         @apply bg-neutral-100 dark:bg-neutral-900;
       }
       ::-webkit-scrollbar-thumb {
         @apply bg-neutral-400 dark:bg-neutral-700;
-        border-radius: 0px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        @apply bg-neutral-500 dark:bg-neutral-600;
       }
       
       .scan-line {
-        background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.5), transparent);
-        animation: scan 2s linear infinite;
+        background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: scan 2.5s ease-in-out infinite;
       }
       
       @keyframes scan {
-        0% { top: 0%; opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { top: 100%; opacity: 0; }
+        0% { top: -5%; opacity: 0; }
+        20% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { top: 105%; opacity: 0; }
+      }
+
+      .flicker {
+        animation: flicker 0.15s infinite;
+      }
+
+      @keyframes flicker {
+        0% { opacity: 0.9; }
+        50% { opacity: 1; }
+        100% { opacity: 0.9; }
       }
     </style>
   <script type="importmap">

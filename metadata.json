@@ -1,0 +1,7 @@
+{
+  "name": "TriVision Sort",
+  "description": "AI-Driven Waste Classification System. Distinguishes between waste and non-waste using computer vision.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

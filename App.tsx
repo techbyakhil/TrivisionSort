@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AppMode, User } from './types';
 import { ScanMode } from './components/ScanMode';
 import { UploadMode } from './components/UploadMode';
+import { HistoryMode } from './components/HistoryMode';
 import { Auth } from './components/Auth';
 import { authService } from './services/authService';
 
@@ -48,138 +49,134 @@ function App() {
         return <ScanMode onStop={() => setMode(AppMode.HOME)} />;
       case AppMode.UPLOAD:
         return <UploadMode onBack={() => setMode(AppMode.HOME)} />;
+      case AppMode.HISTORY:
+        return <HistoryMode onBack={() => setMode(AppMode.HOME)} />;
       case AppMode.HOME:
       default:
         return (
-          <div className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto px-6 py-20 animate-fade-in">
-             <div className="w-full text-center space-y-6 mb-24">
-                <h2 className="text-5xl md:text-7xl font-semibold tracking-tighter text-neutral-900 dark:text-white">
-                    TriVision Sort
-                </h2>
-                <p className="text-neutral-500 text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed">
-                    Advanced computer vision for material classification. Distinguish wet, dry, and burnable waste with high-fidelity AI models.
-                </p>
-             </div>
+          <div className="flex flex-col items-center justify-center w-full min-h-[60vh] animate-fade-in px-6">
+            <div className="text-center mb-12">
+              <h1 className="text-5xl md:text-7xl font-light tracking-tighter text-neutral-900 dark:text-white mb-4">
+                TRIVISION<br/><span className="font-bold">SORT</span>
+              </h1>
+              <p className="text-sm font-mono text-neutral-500 uppercase tracking-[0.2em]">
+                AI-Driven Waste Classification System
+              </p>
+            </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 dark:bg-neutral-900 w-full border border-neutral-200 dark:border-neutral-900">
-                {/* Card 1 */}
-                <div 
-                    className="bg-white dark:bg-black p-12 flex flex-col justify-between h-96 hover:bg-neutral-50 dark:hover:bg-neutral-950 transition-colors cursor-pointer group relative overflow-hidden" 
-                    onClick={() => setMode(AppMode.UPLOAD)}
-                >
-                    <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-black dark:text-white">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="font-mono text-xs text-neutral-500 uppercase tracking-widest mb-2 block">Mode 01</span>
-                        <h3 className="text-3xl text-neutral-900 dark:text-white font-medium tracking-tight">Static Audit</h3>
-                    </div>
-                    <div className="space-y-4">
-                        <div className="w-12 h-12 rounded-full bg-neutral-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all text-neutral-900 dark:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                            </svg>
-                        </div>
-                        <p className="text-sm text-neutral-500 leading-relaxed max-w-xs">
-                            High-resolution analysis of existing datasets. Supports PNG and JPEG formats.
-                        </p>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+              {/* Scan Card */}
+              <button 
+                onClick={() => setMode(AppMode.SCAN)}
+                className="group relative h-64 border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-8 flex flex-col items-center justify-center gap-6 hover:border-neutral-900 dark:hover:border-white transition-all duration-300"
+              >
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-2 h-2 bg-neutral-900 dark:bg-white"></div>
                 </div>
+                <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-neutral-900 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M3 3h6v6H3V3zm12 0h6v6h-6V3zm-12 12h6v6H3v-6zm12 0h6v6h-6v-6z" />
+                    </svg>
+                </div>
+                <div className="text-center">
+                    <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-1">INITIATE SCAN</h3>
+                    <p className="text-xs font-mono text-neutral-500 uppercase">Real-time Analysis</p>
+                </div>
+              </button>
 
-                {/* Card 2 */}
-                <div 
-                    className="bg-white dark:bg-black p-12 flex flex-col justify-between h-96 hover:bg-neutral-50 dark:hover:bg-neutral-950 transition-colors cursor-pointer group relative overflow-hidden" 
-                    onClick={() => setMode(AppMode.SCAN)}
-                >
-                    <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-black dark:text-white">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="font-mono text-xs text-neutral-500 uppercase tracking-widest mb-2 block">Mode 02</span>
-                        <h3 className="text-3xl text-neutral-900 dark:text-white font-medium tracking-tight">Live Recon</h3>
-                    </div>
-                     <div className="space-y-4">
-                        <div className="w-12 h-12 rounded-full bg-neutral-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all text-neutral-900 dark:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
-                            </svg>
-                        </div>
-                        <p className="text-sm text-neutral-500 leading-relaxed max-w-xs">
-                            Real-time inference using device optics. Low latency object discrimination.
-                        </p>
-                    </div>
+              {/* Upload Card */}
+              <button 
+                onClick={() => setMode(AppMode.UPLOAD)}
+                className="group relative h-64 border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-8 flex flex-col items-center justify-center gap-6 hover:border-neutral-900 dark:hover:border-white transition-all duration-300"
+              >
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-2 h-2 bg-neutral-900 dark:bg-white"></div>
                 </div>
-             </div>
+                <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-neutral-900 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                </div>
+                <div className="text-center">
+                    <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-1">UPLOAD SOURCE</h3>
+                    <p className="text-xs font-mono text-neutral-500 uppercase">File Evaluation</p>
+                </div>
+              </button>
+              
+              {/* History Card */}
+              <button 
+                onClick={() => setMode(AppMode.HISTORY)}
+                className="group relative h-64 border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-8 flex flex-col items-center justify-center gap-6 hover:border-neutral-900 dark:hover:border-white transition-all duration-300"
+              >
+                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-2 h-2 bg-neutral-900 dark:bg-white"></div>
+                </div>
+                <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-neutral-900 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div className="text-center">
+                    <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-1">DATA LOGS</h3>
+                    <p className="text-xs font-mono text-neutral-500 uppercase">Analysis History</p>
+                </div>
+              </button>
+            </div>
+            
+            <div className="mt-16 text-xs font-mono text-neutral-400">
+                SYSTEM READY. WAITING FOR INPUT.
+            </div>
           </div>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white flex flex-col font-sans selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 mix-blend-difference px-8 py-6 flex justify-between items-center pointer-events-none">
-          <div className="flex items-center gap-3 pointer-events-auto cursor-pointer" onClick={() => setMode(AppMode.HOME)}>
-             <div className="w-6 h-6 bg-white rounded-sm"></div>
-             <h1 className="text-sm font-bold tracking-widest uppercase text-white">TriVision Sort</h1>
+    <div className="min-h-screen w-full bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white transition-colors duration-300">
+      {/* Header / Nav */}
+      <header className="fixed top-0 left-0 w-full z-50 border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-black/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div 
+            className="font-bold text-lg tracking-tighter cursor-pointer"
+            onClick={() => setMode(AppMode.HOME)}
+          >
+            TRIVISION<span className="font-light text-neutral-500">SORT</span>
           </div>
           
-          <div className="flex gap-6 items-center pointer-events-auto">
-            {user && (
-                 <span className="hidden md:inline text-xs font-mono text-neutral-300 uppercase">USR: {user.username}</span>
-            )}
-            <span className="hidden md:inline text-xs font-mono text-neutral-300">SYS.STATUS: ONLINE</span>
-            
-            {/* Theme Toggle */}
+          <div className="flex items-center gap-6">
             <button 
                 onClick={() => setIsDark(!isDark)}
-                className="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-500 hover:bg-white hover:text-black transition-all text-white"
-                aria-label="Toggle Theme"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
             >
                 {isDark ? (
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-                    </svg>
+                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-                    </svg>
+                    <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                 )}
             </button>
             
-            {/* Logout Button */}
             {user && (
-                <button 
-                    onClick={handleLogout}
-                    className="text-xs font-mono text-white hover:text-red-400 transition-colors uppercase tracking-widest border border-white/20 px-3 py-1 rounded-sm"
-                >
-                    LOGOUT
-                </button>
+                <div className="flex items-center gap-4 border-l border-neutral-200 dark:border-neutral-800 pl-6">
+                    <div className="text-right hidden sm:block">
+                        <div className="text-xs font-mono uppercase tracking-widest text-neutral-500">Operator</div>
+                        <div className="text-sm font-bold">{user.username}</div>
+                    </div>
+                    <button 
+                        onClick={handleLogout}
+                        className="text-xs font-mono uppercase text-red-500 hover:text-red-600 tracking-widest"
+                    >
+                        [ Logout ]
+                    </button>
+                </div>
             )}
           </div>
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col pt-20">
+      <main className="pt-24 pb-12 w-full min-h-screen flex flex-col">
         {renderContent()}
       </main>
-
-      {/* Footer */}
-      <footer className="py-8 border-t border-neutral-200 dark:border-neutral-900">
-        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-            <p className="text-xs text-neutral-500 font-mono">
-                © 2026 TRIVISION SORT
-            </p>
-            <div className="flex gap-4">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            </div>
-        </div>
-      </footer>
     </div>
   );
 }

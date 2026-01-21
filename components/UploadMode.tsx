@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from './Button';
 import { analyzeImage } from '../services/geminiService';
+import { historyService } from '../services/historyService';
 import { AnalysisResult } from '../types';
 import { ResultCard } from './ResultCard';
 
@@ -29,6 +30,10 @@ export const UploadMode: React.FC<UploadModeProps> = ({ onBack }) => {
     if (!selectedImage) return;
     setAnalyzing(true);
     const analysis = await analyzeImage(selectedImage);
+    
+    // Save to history
+    historyService.save(analysis, selectedImage);
+    
     setResult(analysis);
     setAnalyzing(false);
   };

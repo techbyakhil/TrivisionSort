@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './Button';
 import { analyzeImage } from '../services/geminiService';
+import { historyService } from '../services/historyService';
 import { AnalysisResult } from '../types';
 import { ResultCard } from './ResultCard';
 
@@ -60,8 +61,11 @@ export const ScanMode: React.FC<ScanModeProps> = ({ onStop }) => {
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+      // Use slightly lower quality for history storage optimization
+      const base64Image = canvas.toDataURL('image/jpeg', 0.8);
       const analysis = await analyzeImage(base64Image);
+      
+      historyService.save(analysis, base64Image);
       setResult(analysis);
     }
     setAnalyzing(false);

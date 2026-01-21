@@ -2,6 +2,7 @@ export enum AppMode {
   HOME = 'HOME',
   UPLOAD = 'UPLOAD',
   SCAN = 'SCAN',
+  HISTORY = 'HISTORY',
 }
 
 export enum ClassificationType {
